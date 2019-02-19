@@ -25,14 +25,14 @@ Another data viz app, this time representing a network using a linear arrangemen
 
 ## 5-oneNN.html
 [Demo](5-oneNN.html)
-This app builds a data set of nodes in a square and tests the one nearest neighbour algorithm against it. The tomek-links optimisation is also implemented. Orginally discussed in "An introduction to machine learning" by Miroslav Kubat Springer.
+This app builds a data set of nodes in a square and tests the one nearest neighbour algorithm against it. The tomek-links optimisation is also implemented with black lines. Hit refresh to see another random distribution. Orginally discussed in "An introduction to machine learning" by Miroslav Kubat Springer.
 
 ## 6a-btcgbp.html
 [Demo](6a-btcgbp.html)
 Bitcoin price data is analysed using some simple trading signals. Results displayed using the Google charts API.
 
 ## 6b-btc-trading.html
-[Demo](6b-btc-2axes.html)
+[Demo](6b-btc-trading.html)
 A simple trading algorithm is applied to the bitcoin price data. The returns are charted using the Google charts API, and the results are analysed for statistical significance.
 
 ## 7-nm.test.html
