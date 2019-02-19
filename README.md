@@ -6,7 +6,8 @@ This directory is a collection of single page applications that I have built to 
 * Machine learning approaches
 * Automated trading using bitcoin price data
 
-[## 1-boxes.html](http://nickwip-com.stackstaging.com/0_toys/boxes.html)
+## 1-boxes.html
+[Demo](http://nickwip-com.stackstaging.com/0_toys/boxes.html)
 This is a simple implementation of that 3x3 tile game. Fun times :smile:
 
 ## 2-diff_input.html
