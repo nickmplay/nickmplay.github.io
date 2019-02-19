@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * {
+      margin:0;
+    }
+
+    h1 {
+      margin-top: 10px;
+    }
+
+    button, h1 {
+      margin-bottom: 10px;
+    }
+
+    #target {
+      width: 100px;
+      height: 100px;
+      transition: transform 2s;
+      transition-timing-function: cubic-bezier(0.1, 0.7, 1.0, 0.1);
+    }
+
+    .content {
+      max-width: 80%;
+      margin: auto;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="content">
+    <h1>Rotate with smoothing</h1>
+
+    <button onclick="return setWidth();">Click to Animate</button>
+    <br />
+    <svg id="target">
+      <circle cx=50 cy=50 r=40 stroke="black" stroke-width="5" fill="white"></circle>
+      <line x1=10 y1=90 x2=90 y2=10 stroke="black" stroke-width="5"></line>
+    </svg>
+  </div>
+
+  <script>
+  //function to rotate the target svg by +360 degrees
+  const setWidth = () => {
+    const t = document.getElementById("target");
+    const deg = t.style.transform;
+
+    if ( deg.length == 0 ){
+      t.style.transform = "rotate(360deg)";
+    } else {
+      const newDeg = parseInt(deg.split("(")[1].split("d")[0]) + 360;
+      t.style.transform = `rotate(${newDeg}deg)`;
+    } 
+    return false;
+  }
+
+  </script>
+</body>
+</html>

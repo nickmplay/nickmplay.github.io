@@ -1,0 +1,199 @@
+<!doctype html>
+<html>
+<head>
+    <title>T links example</title>
+
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+<style>
+	svg {
+		background-color:lightgrey;
+	}
+</style>
+	
+</head>
+<body>
+
+<div id=main>
+<h1 id="head1">Hello World</h1>
+
+<svg id="svg1" width=600 height=500>
+</svg>
+
+
+</div>
+
+
+</body>
+<script>
+//implementing the 1nearest neighbour algorithm from 
+//"An introduction to machine learning" by Miroslav Kubat Springer
+var i, rad = 10, nCircles = 50, err = 0.2;
+var bNoError = false;
+var h = document.getElementById("head1");
+h.innerHTML = "Nearest neighbour algorithm";
+var svg = document.getElementById("svg1");
+var x_max = parseInt( svg.getAttribute("width"));
+var y_max = parseInt( svg.getAttribute("height"));
+
+//add generated data to nodes data object
+var nodes = [];
+for (i=0; i<nCircles; i++){
+	var toAdd = {};
+	toAdd.x = Math.floor((Math.random() * (x_max - 2*rad)) + rad);
+	toAdd.y = Math.floor((Math.random() * (y_max - 2*rad)) + rad);
+	
+	if (Math.random() < err) {bNoError = false} else {bNoError = true}
+	
+	if ( toAdd.x > toAdd.y && bNoError){
+		toAdd.colour = "red";
+	} else {
+		toAdd.colour = "blue";
+	}
+	
+	nodes.push(toAdd);
+}
+
+//add testing node
+/*
+var toAdd = {};
+toAdd.x = Math.floor((Math.random() * (x_max - 2*rad)) + rad); //0.5 * x_max;
+toAdd.y = Math.floor((Math.random() * (y_max - 2*rad)) + rad); //0.5 * y_max;
+toAdd.colour = "yellow";
+nodes.push(toAdd);
+*/
+
+//create circles in svg
+var circles = [];
+for (i=0; i<nodes.length; i++){
+	circles[i] = svgCircle(nodes[i].x, nodes[i].y, rad, nodes[i].colour);
+	circles[i].setAttribute("id", i);
+	svg.appendChild(circles[i]);
+}
+
+//find and flag the nearest neighbour to testing node
+/*
+var nearest = oneNN( nodes[nCircles].x, nodes[nCircles].y, nodes);
+var join = svgLine(	nodes[nearest.index].x, nodes[nearest.index].y,
+					nodes[nCircles].x, nodes[nCircles].y, "black");
+svg.appendChild(join);
+*/
+/* flag with a white border 
+circles[nearest.index].setAttribute("stroke","white");
+circles[nearest.index].setAttribute("stroke-width",5);
+*/
+
+//find tomek links
+var ts = tLinks(nodes);
+var lines = [];
+for (i=0; i<ts.length; i++){
+	lines[i] = svgLine(	nodes[ts[i].i1].x, nodes[ts[i].i1].y,
+						nodes[ts[i].i2].x, nodes[ts[i].i2].y,
+						"black");
+	svg.appendChild(lines[i]);
+}
+
+//remove duplicates
+var uts = [];
+for (i=0; i<ts.length; i++){
+	uts.push(ts[i].i1);
+	uts.push(ts[i].i2);
+}
+uts.sort(function(a,b){return a - b});
+uts = uniq(uts);
+
+//***Functions ***
+//function to determine the nearest neighbour
+function oneNN(x_i, y_i, nodes_i){
+	//return "inputs: x=" + x_i + " y=" + y_i + " length=" + nodes_i.length;
+	var output="", x_d, y_d, d; 
+	var i_min = {"d":10000, "index":0};
+	
+	for (var i=0; i<nodes_i.length; i++) {
+		x_d = x_i - nodes_i[i].x;
+		y_d = y_i - nodes_i[i].y;
+		d = Math.sqrt(x_d**2 + y_d**2);
+		
+		if (d < i_min.d && d > 0){
+			i_min.d = d;
+			i_min.index = i;
+		}
+	}
+	return i_min;
+}
+
+//return t-links
+function tLinks(nodes_i){
+	var i1=0, i2=0;
+	var nearest, tlinksRes = []; 
+	for (i1=0; i1<nodes_i.length; i1++){
+		var toAdd = {};
+		toAdd.i1 = i1;
+		toAdd.i1Colour = nodes_i[i1].colour;
+		nearest = oneNN(nodes_i[i1].x, nodes_i[i1].y, nodes_i);
+		toAdd.i2 = nearest.index;
+		toAdd.i2Colour = nodes_i[nearest.index].colour;
+		
+		//test if both nodes are each others' oneNN
+		toAdd.i2oneNN = oneNN(nodes_i[toAdd.i2].x, nodes_i[toAdd.i2].y, nodes_i).index;
+		
+		//filter for opposites, duplication possible
+		if (toAdd.i2Colour != toAdd.i1Colour && toAdd.i2oneNN == toAdd.i1){ 
+			tlinksRes.push(toAdd);
+		}
+	}
+	
+	return tlinksRes;
+}
+
+//return unique array
+function uniq(a) {
+    var seen = {};
+    return a.filter(function(item) {
+        return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+    });
+}
+
+//hide t-link node array
+function hideTs(){
+	for (i=0; i<uts.length; i++){ 
+	circles[uts[i]].setAttribute("fill","lightgrey"); 
+	}
+}
+
+//show t-link node array
+function showTs(){
+	for (i=0; i<uts.length; i++){ 
+	circles[uts[i]].setAttribute("fill",nodes[uts[i]].colour); 
+	}
+}
+
+//return an SVG circle object
+function svgCircle(xi, yi, radi, filli){
+	var elem;
+	elem = document.createElementNS("http://www.w3.org/2000/svg","circle");
+	elem.setAttribute("cx", xi);
+	elem.setAttribute("cy", yi);
+	elem.setAttribute("r", radi);
+	elem.setAttribute("fill", filli);
+	
+	return elem;
+}
+
+//return an SVG line object
+function svgLine(x1i, y1i, x2i, y2i, strokei){
+	var elem;
+	elem = document.createElementNS("http://www.w3.org/2000/svg","line");
+	elem.setAttribute("x1", x1i);
+	elem.setAttribute("y1", y1i);
+	elem.setAttribute("x2", x2i);
+	elem.setAttribute("y2", y2i);
+	elem.setAttribute("stroke", strokei);
+	
+	return elem;
+}
+	
+</script>
+
+
+</html>

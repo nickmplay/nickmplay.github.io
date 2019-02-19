@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Jasmine Test</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.6.1/jasmine.min.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.6.1/jasmine.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.6.1/jasmine-html.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.6.1/boot.min.js"></script>
+	<script src="nm.js" type="text/javascript"></script>
+</head>
+<body>
+
+<script>
+//jasmine docs:https://jasmine.github.io/2.3/introduction.html#section-Expectations
+
+//have nm.js functions loaded
+describe("nm.js load ok?", function(){
+	it("returns true if the test variable has loaded succesfully", function(){
+		expect(nmjs).toEqual(true);
+	});
+});
+
+//example - isPalindrome
+describe("isPalindrome", function(){
+	it("returns true if the string is a palindrome", function(){
+		expect(isPalindrome("abba")).toEqual(true);
+	});
+});
+
+//round to 2dp
+describe("round to 2dp", function(){
+	it("returns true if the number is rounded up/down correctly x3", function(){
+		expect(r2dp(12.123)).toEqual(12.12);
+		expect(r2dp(12.128)).toEqual(12.13);
+		expect(r2dp(12.123)).not.toEqual(12.123);
+	});
+});
+
+//print number as string with commas
+describe("return number with commas - use with cation eg v large numbers and >4 dp", function(){
+	it("returns true if the number is correctly formatted x2", function(){
+		expect(numberWithCommas(12.123)).toEqual("12.123");
+		expect(numberWithCommas(123456789.123)).toEqual("123,456,789.123");
+	});
+});
+
+//date processing
+describe("date processing", function(){
+	var dE = new Date(2016, 11, 31);
+		
+	it("returns true if the YYYY-MM-DD is converted to a date object", function(){
+		expect(returnDate("2016-12-31")).toEqual(dE);
+	});
+	
+	it("returns true if the DD/MM/YYYY is converted to a date object", function(){
+		expect(returnDate("31/12/2016")).toEqual(dE);
+	});
+	
+	it("returns true if n=[+,-,0] days between dates is correct x3", function(){
+		expect(nDays("31/12/2016","31/12/2017")).toEqual(365);
+		expect(nDays("31/12/2016","01/12/2016")).toEqual(-30);
+		expect(nDays("31/12/2016","31/12/2016")).toEqual(0);
+	});
+	
+	it("returns true if ApreB is correct x3", function(){
+		expect(isApreB("31/12/2016","01/12/2016")).toEqual(false);
+		expect(isApreB("31/12/2015","01/12/2016")).toEqual(true);
+		expect(isApreB("31/12/2015","31/12/2015")).toEqual(false);
+	});
+	
+	it("returns true if ApostB is correct x3", function(){
+		expect(isApostB("31/12/2016","01/12/2016")).toEqual(true);
+		expect(isApostB("31/12/2015","01/12/2016")).toEqual(false);
+		expect(isApostB("31/12/2015","31/12/2015")).toEqual(false);
+	});
+	
+	it("returns true if correct date string x10", function(){
+		expect(dayStr(1)).toEqual("1st");
+		expect(dayStr(2)).toEqual("2nd");
+		expect(dayStr(3)).toEqual("3rd");
+		expect(dayStr(4)).toEqual("4th");
+		
+		expect(dayStr(21)).toEqual("21st");
+		expect(dayStr(22)).toEqual("22nd");
+		expect(dayStr(23)).toEqual("23rd");
+		
+		expect(dayStr(31)).toEqual("31st");
+		expect(dayStr(32)).not.toEqual("32nd");
+		expect(dayStr(32)).toEqual("Date not possible");
+	});
+	
+});
+
+//data processing
+describe("array of arrays to HTML string", function(){
+	var testArray = [["a","b"],[1,2],[3,4]];
+	var testStr = "<table><tr><th>a</th><th>b</th></tr><tr><td>1</td><td>2</td></tr><tr><td>3</td><td>4</td></tr></table>";
+	
+	it("returns true if table correctly converted", function(){
+		expect(googToHTML(testArray)).toEqual(testStr);
+	});
+});
+
+describe("append xMA data to array of arrays", function(){
+	var testArray = [["a","b"],[1,2],[2,5],[3,3],[4,4],[5,8],[6,7]];
+	var testArray2 = [["a","b","2MA"],[1,2,2],[2,5,5],[3,3,3.5],[4,4,4],[5,8,3.5],[6,7,6]];
+	var testArray4 = [["a","b","2MA","4MA"],[1,2,2,2],[2,5,5,5],[3,3,3.5,3],[4,4,4,4],[5,8,3.5,3.5],[6,7,6,5]];
+	
+	it("returns true if xMA added correctly x3", function(){
+		expect(addXMA(testArray,2,2)).toEqual("colNum exceeds the column limit of 2");
+		expect(addXMA(testArray,1,2)).toEqual(testArray2);
+		expect(addXMA(testArray2,1,4)).toEqual(testArray4);
+	});
+});
+
+describe("append xSD data to array of arrays", function(){
+	var testArray = [["a","b"],[1,3],[2,5],[3,1],[4,9],[5,17],[6,20]];
+	var resArray = [["a","b","3SD"],[1,3,0],[2,5,0],[3,1,0],[4,9,2],[5,17,4],[6,20,8]];
+	
+	it("returns true if xSD added correctly", function(){
+		expect(addXSD(testArray,1,3)).toEqual(resArray);
+	});
+});
+
+describe("append xBB data to array of arrays", function(){
+	var testArray = [["a","b"],[1,3],[2,5],[3,1],[4,9],[5,17],[6,20]];
+	var resArray = [["a","b","3BB-","3MA","3BB+"],[1,3,3,3,3],[2,5,5,5,5],[3,1,1,1,1],[4,9,-1,3,7],[5,17,-3,5,13],[6,20,-7,9,25]];
+	
+	it("returns true if xBB added correctly", function(){
+		expect(addXBB(testArray,1,3)).toEqual(resArray);
+	});
+});
+
+
+
+describe("array of objects to HTML string", function(){
+	var testArray = [{a:1, b:2}, {a:3, b:4}];
+	var testStr = "<table><tr><th>a</th><th>b</th></tr><tr><td>1</td><td>2</td></tr><tr><td>3</td><td>4</td></tr></table>";
+
+	it("returns true if table correctly converted", function(){
+		expect(tableJSON(testArray)).toEqual(testStr);
+	});
+});
+
+describe("append class to table row/col x3", function(){
+	var testStr = "<table><tr><th>a</th><th>b</th></tr><tr><td>1</td><td>2</td></tr><tr><td>3</td><td>4</td></tr></table>";
+	var threeStr = '<table><tbody><tr><th>a</th><th>b</th></tr><tr><td>1</td><td>2</td></tr><tr class="found"><td>3</td><td>4</td></tr></tbody></table>';
+	var oneStr = '<table><tbody><tr><th>a</th><th>b</th></tr><tr><td class="found2">1</td><td>2</td></tr><tr><td>3</td><td>4</td></tr></tbody></table>';
+
+	it("returns true if table correctly updated", function(){
+		expect(addTagClass(testStr, "tr", 3, "found")).toEqual(threeStr);
+		expect(addTagClass(testStr, "td", 1, "found2")).toEqual(oneStr);
+		expect(addTagClass(testStr, "td", 8, "found2")).toEqual(testStr);
+	});
+});
+
+describe("passing a function as an argument", function(){
+	var result = run2args(1, 2, function(a,b){return a + b;});
+	
+	it("returns true if arguments processed correctly", function(){
+		expect(result).toEqual(3);
+	});
+});
+
+describe("array of combinations from array", function(){
+	var aOriginal = [1,2,3];
+	var aCombos = [[1,2], [1,3], [2,3]];
+
+	it("returns true if correct combinations are returned", function(){
+		expect(combinations(aOriginal, 2)).toEqual(aCombos);
+	});
+});
+
+describe("array of possibilities from two arrays", function(){
+	var aOriginal = [1,2];
+	var aPoss = [[1,1], [1,2], [2,1], [2,2]];
+
+	it("returns true if correct possibilities are returned", function(){
+		expect(allPoss(aOriginal, aOriginal)).toEqual(aPoss);
+	});
+});
+
+describe("return array of unique array elements", function(){
+	var testArray = [["a","b"],[1,3],[2,5],[1,3],[2,5],[1,3],[6,20]];
+	var resArray = [["a","b"],[1,3],[2,5],[6,20]];
+	
+	it("returns true if only distinct elements returned", function(){
+		expect(uniqueArray(testArray)).toEqual(resArray);
+	});
+});
+
+describe("return the standard deviation of an array", function(){
+	var nums = [1,2,3,4,5,6,7,8,9];
+	
+	it("returns true if correct sd is calculated", function(){
+		expect(sdArray(nums)).toBeCloseTo(2.738);
+	});
+});
+
+</script>
+</body>
+</html>

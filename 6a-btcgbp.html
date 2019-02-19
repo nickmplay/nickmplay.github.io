@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>btc analysis</title>
+<style> 
+table {border-collapse: collapse;}  table, th, td {border: 1px solid black; padding:5px; margin:0 auto} 
+.cent {margin:0 auto}
+.mid {text-align:center; margin:3px }
+#output {margin-top:10px}
+</style>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript" src="./BTC_GBP_2014-2017.js"></script>
+</head>
+<body>
+
+
+<div id="curve_chart" class="cent" style="width: 900px; height: 500px"></div>
+<div id="output"></div>
+
+
+<script>
+
+//process data for google
+var googRes = [];
+googRes.push(["Index", "GBP/BTC Price"]);
+for (i=0; i<btcgbp.length; i++){
+	//date filter
+	var dateStr = btcgbp[i].time.split("T")[0];
+	//var bTest = isApostB(dateStr, "2016-01-01") && isApreB(dateStr, "2017-01-01");
+	var bTest = isApostB(dateStr, "2016-12-31") ;
+	
+	
+	if(bTest){
+		googRes.push([dateStr, btcgbp[i].close]);
+	}
+}
+
+//add 3SMA to googRes
+for (i=0; i<googRes.length; i++){
+	if (i>3){
+		googRes[i].push(
+			r2dp(
+				(googRes[i-1][1] + googRes[i-2][1] + googRes[i-3][1])/3
+			)
+		)
+	} else {
+		googRes[i].push(googRes[i][1]);
+	}
+}
+googRes[0][2] = "3SMA";
+
+//display in a google chart
+//https://developers.google.com/chart/interactive/docs/gallery/linechart
+google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(drawChart);
+function drawChart() {
+	var data = google.visualization.arrayToDataTable(googRes);
+
+	var options = {
+		title: 'GBP/BTC Price History',
+		//curveType: 'function',	//to smooth the line
+		legend: { position: 'bottom' },
+		hAxis: {title:"Date"},
+		vAxis: {title:"GBP/BTC"},
+	};
+
+	var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+	chart.draw(data, options);
+}
+
+document.getElementById("output").innerHTML = googToHTML(googRes);
+
+//**Functions**
+//date processing
+function returnDate(data){
+	var dateArray = data.split("-");
+	var d = new Date( dateArray[0], dateArray[1]-1, dateArray[2]);
+	return d;
+}
+
+function nDays(ds0, ds1){
+	var d0 = returnDate(ds0);
+	var d1 = returnDate(ds1);
+	
+	return Math.round( (d1 - d0)/(1000*60*60*24) );
+}
+
+function isApreB(dsA, dsB){
+	return nDays(dsA, dsB) > 0 ? true : false;
+}
+
+function isApostB(dsA, dsB){
+	return dsA == dsB ? false : !isApreB(dsA, dsB);
+}
+
+//round to 2dp
+function r2dp(number){
+	return Math.round(number*100)/100;
+}
+
+function googToHTML(dataArray){
+	var i=0, j=0;
+	var oHeaders = dataArray[0];
+	var nHeaders = oHeaders.length;
+	var tb = {
+		s: "<tr><td>",
+		i: "</td><td>",
+		e: "</td></tr>"
+	};
+	
+	var sHTML = "<table><tr>";
+	
+	//loop headers
+	for(i=0; i<nHeaders; i++){
+		sHTML += "<th>" + oHeaders[i] + "</th>";
+	}
+	sHTML += "</tr>";
+	
+	//load data	//load data into table html
+	for (i=1; i<dataArray.length; i++){
+		for (j=0; j<oHeaders.length; j++){
+			j==0 ? sHTML += tb.s : sHTML += tb.i; 
+			sHTML += dataArray[i][j];
+			j+1 == oHeaders.length ? sHTML += tb.e : sHTML += "";
+		}
+	}
+	sHTML += "</table>";
+	return sHTML; 
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Arc network</title>
+<style>
+svg { background-color:lightgrey; }
+path {fill:none; stroke:#446688; stroke-width:2}
+</style>
+</head>
+<body>
+<svg id="svgMain" width=500 height=500>
+</svg>
+<script>
+//***Initialisation***
+//transform="translate(0,500) scale(1,-1)" for the first g in svg
+var i;
+var refCount=0, refLimit=100, refRate = 50;
+var rad=10, radOffset = rad/2;
+var svg = document.getElementById("svgMain");
+
+//node data
+var nodes = [
+{"id":0, "x":100, "y":100, "colour":"blue"}, 
+{"id":1, "x":100, "y":150, "colour":"red"}, 
+{"id":2, "x":100, "y":200, "colour":"green"}, 
+{"id":3, "x":100, "y":250, "colour":"violet"}, 
+{"id":4, "x":100, "y":300, "colour":"blue"}, 
+{"id":5, "x":100, "y":350, "colour":"red"}, 
+{"id":6, "x":100, "y":400, "colour":"green"}, 
+{"id":7, "x":100, "y":450, "colour":"violet"}
+];
+
+//link data
+var links = [
+{"start":7, "end":0}, 
+{"start":2, "end":5}, 
+{"start":6, "end":0}, 
+{"start":3, "end":2}, 
+{"start":5, "end":1}, 
+{"start":2, "end":7}, 
+{"start":4, "end":5}, 
+{"start":3, "end":4}
+];
+
+//implementing http://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=6297585
+//create and populate neighbours array 
+var neighboursA = [];
+for (i=0; i < nodes.length; i++){ neighboursA[i] = [];}
+for (i=0; i < links.length; i++){
+	neighboursA[ links[i].start ].push(links[i].end  );
+	neighboursA[ links[i].end   ].push(links[i].start);
+}
+
+//create arcs (before circles)
+var arcs = [];
+for (i=0; i < links.length; i++){
+	arcs[i] = document.createElementNS("http://www.w3.org/2000/svg","path");
+	var arcP = arcXYRAD(links[i], nodes);
+	arcs[i].setAttribute("d", describeArc(arcP.x, arcP.y, arcP.rad, 0, 180) );
+	svg.appendChild( arcs[i] );
+}
+ 
+//create circles
+var circles = [];
+for (i=0; i < nodes.length; i++){
+	circles[i] = document.createElementNS("http://www.w3.org/2000/svg","circle");
+	circles[i].setAttribute("cx", nodes[i].x);
+	circles[i].setAttribute("cy", nodes[i].y);
+	circles[i].setAttribute("r", rad);
+	circles[i].setAttribute("fill", nodes[i].colour);
+	svg.appendChild( circles[i] );
+}
+
+//create text labels
+var labels = [];
+for (i=0; i < nodes.length; i++){
+	labels[i] = document.createElementNS("http://www.w3.org/2000/svg","text");
+	labels[i].setAttribute("text-anchor", "middle");
+	labels[i].setAttribute("x", nodes[i].x);
+	labels[i].setAttribute("y", nodes[i].y + radOffset );
+	labels[i].style.fill = "white" ;
+	//labels[i].setAttribute("rotate", "180");
+	//labels[i].innerHTML = i;
+	labels[i].textContent = i;
+	svg.appendChild( labels[i] );
+}
+
+
+//***Functions***
+//http://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
+//transform polar to cartesian
+function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+  var angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
+  return {
+    x: centerX + (radius * Math.cos(angleInRadians)),
+    y: centerY + (radius * Math.sin(angleInRadians))
+  };
+}
+
+//convert link-node data into arc parameters
+function arcXYRAD(link, nodes){
+	//read in data
+	var x1 = nodes[ link.start ].x;
+	var x2 = nodes[ link.end ].x;
+	var y1 = nodes[ link.start ].y;
+	var y2 = nodes[ link.end ].y;
+
+	//calculate arc parameters
+	//assumes 0-180 deg arc span; any other arc span needs xy adj
+	//assumes x-aligned for radD calc
+	var xD = Math.abs( (x1 + x2)/2 );
+	var yD = Math.abs( (y1 + y2)/2 );
+	var radD = Math.abs( (y1 - y2)/2 );
+	
+	return {x:xD, y:yD, rad:radD}
+}
+
+//create arc path for svg
+function describeArc(x, y, radius, startAngle, endAngle){
+    var start = polarToCartesian(x, y, radius, endAngle);
+    var end = polarToCartesian(x, y, radius, startAngle);
+
+    var largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+
+    var d = [
+        "M", start.x, start.y, 
+        "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y
+    ].join(" ");
+
+    return d;       
+}
+
+
+</script>
+</body>
+</html>

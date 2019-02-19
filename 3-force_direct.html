@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Test</title>
+<style>
+svg {
+background-color:lightgrey;
+}
+</style>
+</head>
+<body>
+<svg width=500 height=500>
+<g>
+</g>
+</svg>
+<script>
+//***Initialisation***
+//transform="translate(0,500) scale(1,-1)" for the first g in svg
+var i;
+var refCount=0, refLimit=200, refRate = 50;
+var rad=10, radOffset = rad/2;
+var svg = document.getElementsByTagName("g")[0];
+
+//node data
+var nodes = [
+	{id:0, x:100, y:400, colour:"blue"}, 
+	{id:1, x:110, y:150, colour:"red"}, 
+	{id:2, x:120, y:200, colour:"green"}, 
+	{id:3, x:130, y:250, colour:"violet"}, 
+	{id:4, x:120, y:300, colour:"blue"}, 
+	{id:5, x:110, y:350, colour:"red"}, 
+	{id:6, x:100, y:100, colour:"green"}, 
+	{id:7, x:120, y:150, colour:"violet"}
+];
+
+//link data
+var links = [
+	{start:7, end:0}, 
+	{start:2, end:5}, 
+	{start:6, end:0}, 
+	{start:3, end:2}, 
+	{start:5, end:1}, 
+	{start:2, end:7}, 
+	{start:4, end:5}, 
+	{start:3, end:4}
+];
+
+/*
+//test data
+//node data
+var nodes = [
+{"x":100, "y":100, "colour":"blue"},
+{"x":100, "y":200, "colour":"red"},
+{"x":200, "y":200, "colour":"green"},
+{"x":200, "y":300, "colour":"violet"},
+];
+//link data
+var links = [
+{"start":0, "end":1},
+{"start":1, "end":2},
+{"start":0, "end":2},
+{"start":2, "end":3}
+];
+*/
+
+//derive neighbours string array
+var neighbours = [];
+for (i=0; i < links.length; i++){
+	neighbours[ links[i].start ] += links[i].end + "; ";
+	neighbours[ links[i].start ] = neighbours[ links[i].start ].replace("undefined","");
+	neighbours[ links[i].end ] += links[i].start + "; ";
+	neighbours[ links[i].end ] = neighbours[ links[i].end ].replace("undefined","");
+}
+
+//create lines (before circles)
+var lines = [];
+for (i=0; i < links.length; i++){
+	lines[i] = document.createElementNS("http://www.w3.org/2000/svg","line");
+	lines[i].setAttribute("x1", nodes[ links[i].start ].x);
+	lines[i].setAttribute("y1", nodes[ links[i].start ].y);
+	lines[i].setAttribute("x2", nodes[ links[i].end ].x);
+	lines[i].setAttribute("y2", nodes[ links[i].end ].y);
+	lines[i].setAttribute("stroke", "black");
+	svg.appendChild( lines[i] );
+}
+
+//create circles
+var circles = [];
+for (i=0; i < nodes.length; i++){
+	circles[i] = document.createElementNS("http://www.w3.org/2000/svg","circle");
+	circles[i].setAttribute("cx", nodes[i].x);
+	circles[i].setAttribute("cy", nodes[i].y);
+	circles[i].setAttribute("r", rad);
+	circles[i].setAttribute("fill", nodes[i].colour);
+	svg.appendChild( circles[i] );
+}
+
+//create text labels
+var labels = [];
+for (i=0; i < nodes.length; i++){
+	labels[i] = document.createElementNS("http://www.w3.org/2000/svg","text");
+	labels[i].setAttribute("text-anchor", "middle");
+	labels[i].setAttribute("x", nodes[i].x);
+	labels[i].setAttribute("y", nodes[i].y + radOffset );
+	labels[i].style.fill = "white" ;
+	//labels[i].setAttribute("rotate", "180");
+	//labels[i].innerHTML = i;
+	labels[i].textContent = i;
+	svg.appendChild( labels[i] );
+}
+
+//create progress bar background
+var prog2 = document.createElementNS("http://www.w3.org/2000/svg","rect");
+prog2.setAttribute("x", 10);
+prog2.setAttribute("y", 10);
+prog2.setAttribute("width", 480);
+prog2.setAttribute("height", 10);
+prog2.style.strokeWidth = 1;
+prog2.style.stroke = "black";
+prog2.style.fill = "lightgrey";
+svg.appendChild( prog2);
+
+//create progress bar
+var prog = document.createElementNS("http://www.w3.org/2000/svg","rect");
+prog.setAttribute("x", 10);
+prog.setAttribute("y", 10);
+prog.setAttribute("width", 10);
+prog.setAttribute("height", 10);
+prog.style.fill = "blue";
+svg.appendChild( prog);
+
+//***Funcions***
+//update svg
+function updateSVG(){
+	//lines
+	for (i=0; i < links.length; i++){
+		lines[i].setAttribute("x1", nodes[ links[i].start ].x);
+		lines[i].setAttribute("y1", nodes[ links[i].start ].y);
+		lines[i].setAttribute("x2", nodes[ links[i].end ].x);
+		lines[i].setAttribute("y2", nodes[ links[i].end ].y);
+	}
+	
+	//circles
+	for (i=0; i < nodes.length; i++){
+		circles[i].setAttribute("cx", nodes[i].x);
+		circles[i].setAttribute("cy", nodes[i].y);
+		circles[i].setAttribute("fill", nodes[i].colour);
+	}
+	
+	//labels
+	for (i=0; i < nodes.length; i++){
+		labels[i].setAttribute("x", nodes[i].x);
+		labels[i].setAttribute("y", nodes[i].y + radOffset);
+	}
+	
+	//progress bar
+	prog.setAttribute("width",(refCount / refLimit)*480)
+}
+
+//move node and adjoining lines
+function moveNode(nodeID,dx,dy){
+	nodes[nodeID].x += dx;
+	nodes[nodeID].y += dy;
+	updateSVG();
+}
+
+//return neighbours array
+function nodeNeighbours(nodeID){
+	if (typeof neighbours[nodeID] === "string"){
+		var n = neighbours[nodeID].split(";").length -1;
+		return neighbours[nodeID].split(";",n);
+	} else {
+		return "node not found";
+	}
+}
+
+//force-directed algorithm, implementing:
+//http://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=6297585
+function runFD(){
+	var i1, i2, j;
+	var n = nodes.length;
+	var obj = {};
+	var L = 40;
+	var K_r = 6250;
+	var K_s = 1.2;
+	var delta_t = 0.04;
+	
+	//initialise force object values
+	for (i1=0; i1<n; i1++){
+		var oElem = {"fx":0,"fy":0};
+		obj[i1] = oElem;
+		//obj[i1].fx = Math.random();
+	}
+	
+	//force repulsion between pairs
+	for (i1=0; i1<n-1; i1++){
+		for (i2=i1+1; i2<n; i2++){
+			var dx = nodes[i2].x - nodes[i1].x;
+			var dy = nodes[i2].y - nodes[i1].y;
+			var disSquared = dx*dx + dy*dy;
+			var distance = Math.sqrt(disSquared);
+			var force = K_r / disSquared;
+			var fx = force * (dx / distance);
+			var fy = force * (dy / distance);
+			obj[i1].fx -= fx;
+			obj[i1].fy -= fy;
+			obj[i2].fx += fx;
+			obj[i2].fy += fy;
+			//console.log("i1-" + i1 + ", i2-" + i2 + ", dx-" + dx + ", dy-" + dy)
+		}
+	}
+	
+	// force attraction between links
+	for (i1=0; i1<n-1; i1++){
+		var i1Neighbours = nodeNeighbours(i1);
+		for (j=0; j<i1Neighbours.length; j++){
+			i2 = parseInt(i1Neighbours[j]);
+			if (i1<i2){
+				dx = nodes[i2].x - nodes[i1].x;
+				dy = nodes[i2].y - nodes[i1].y;
+				disSquared = dx*dx + dy*dy;
+				distance = Math.sqrt(disSquared);
+				force = K_s * (distance - L);
+				fx = force * (dx / distance);
+				fy = force * (dy / distance);
+				obj[i1].fx += fx;
+				obj[i1].fy += fy;
+				obj[i2].fx -= fx;
+				obj[i2].fy -= fy;
+				//console.log("i1-" + i1 + ", j-" + j + ", i2-" + i2 );
+			}
+		}
+	}
+	
+	//update positions
+	for (i1=0; i1<n; i1++){
+		dx = delta_t * obj[i1].fx;
+		dy = delta_t * obj[i1].fy;
+		nodes[i1].x += dx;
+		nodes[i1].y += dy;
+	}
+	
+	updateSVG();
+	refCount++;
+	//console.log(obj);
+	console.log(refCount);
+	if (refCount == refLimit +1){
+		clearTimeout(reps);
+	}
+}
+
+//***Client Code***
+var reps = setInterval(runFD,refRate);
+</script>
+</body>
+</html>

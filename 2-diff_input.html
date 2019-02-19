@@ -1,0 +1,119 @@
+<!DOCTYPE HTML><html><head>
+<meta http-equiv="Content-Type" content="text/html"; charset="UTF-8">
+<title>js Differences</title>
+<script src="jsdiff.js"></script>
+<style>
+table {border-collapse: collapse; table-layout:fixed; width:60%}  
+table, h2 {width:75%; margin: 0 auto;}
+h2 {text-align:center}
+table, th, td {border: 1px solid black; padding:5px}
+del, th:first-of-type, .origLabel {background:rgb(109, 234, 161)}
+ins, th:last-of-type, .newLabel {background:rgb(234, 239, 90)}
+.whole {width:100%; float:left}
+.sectionbr {clear:both; height:10px}
+.half {width:50%}
+.whole {width:100%}
+.centerMargin {margin:0 25%}
+form {text-align:center}
+textarea {padding:0}
+.btnClear {margin-right: 10px} .btnW {width:120px}
+.origLabel {border-width: 0 2px 0 0; border-style:solid; border-color:rgb(109, 234, 161)}
+.newLabel {border-width: 0 2px 0 0; border-style:solid; border-color:rgb(234, 239, 90)}
+</style>
+
+</head><body>
+
+<h2>Text Side-by-Side Comparison</h2>
+<br />
+
+<div class="whole">
+<form class="centerMargin" action="">
+	<div class="origLabel">Enter Original Text:<textarea class="whole" name="origText" cols="100" rows="3"></textarea></div>
+	<div class="sectionbr"> </div>
+	<div class="newLabel">Enter New Text:<textarea class="whole" name="newText" cols="100" rows="3"></textarea></div>
+	<div class="sectionbr"> </div>
+	<div class="whole">
+		<button class="btnClear btnW" onclick="return clearInputs();">Clear inputs</button>
+		<button class="btnW" onclick="return parse();">Compare inputs</button>
+	</div>
+</form>
+</div>
+
+<div class="sectionbr"> </div>
+
+
+<table>
+	<tr>
+	<th>Original</th>
+	<th>New</th>
+	</tr>
+
+	<tr>
+	<td id="input1"></td>
+	<td id="input2"></td>
+	</tr>
+
+	<tr>
+	<td colspan="2" id="output1"></td>
+	</tr>
+
+	<tr>
+	<td id="output2"></td>
+	<td id="output3"></td>
+	</tr>
+
+	<tr>
+	<td id="output4"></td>
+	<td id="output5"></td>
+	</tr>
+	
+</table>
+
+<br />
+<br />
+<a href="http://ejohn.org/projects/javascript-diff-algorithm/" target="_blank">Source of the difference algorithm</a>
+
+<script>
+
+function clearInputs(e){
+	document.forms[0]["origText"].value = "";
+	document.forms[0]["newText"].value = "";
+	parse();
+	return false;
+}
+
+function parse(){
+	//declare two inputs for comparison
+	var inp1Original = document.forms[0]["origText"].value;
+	var inp2New = document.forms[0]["newText"].value;
+
+	//display inputs
+	document.getElementById("input1").innerHTML = inp1Original;
+	document.getElementById("input2").innerHTML = inp2New;
+
+	//display amalgamated text 
+	//document.getElementById("output1").style.background = "lightgrey";
+	document.getElementById("output1").innerHTML = diffString(inp1Original, inp2New);
+
+	//display augmented inputs
+	var secondWay = diffString2(inp1Original, inp2New);
+	document.getElementById("output2").innerHTML = secondWay.o;
+	document.getElementById("output3").innerHTML = secondWay.n;
+
+	//count instances
+	var delNum = document.getElementById("output1").getElementsByTagName("del").length;
+	document.getElementById("output4").innerHTML = delNum;
+	document.getElementById("output4").style.textAlign = "center";
+	document.getElementById("output4").style.background = (delNum > 0) ? "red" : "green";
+
+	var insNum = document.getElementById("output1").getElementsByTagName("ins").length;
+	document.getElementById("output5").innerHTML = insNum;
+	document.getElementById("output5").style.textAlign = "center";
+	document.getElementById("output5").style.background = (insNum > 0) ? "red" : "green";
+
+	return false;
+}
+
+
+</script>
+</body></html>

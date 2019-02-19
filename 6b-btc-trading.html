@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>btc analysis</title>
+<style> 
+table {border-collapse: collapse;}  table, th, td {border: 1px solid black; padding:5px; margin:0 auto} 
+.cent {margin:0 auto}
+.mid {text-align:center; margin:3px }
+</style>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+</head>
+<body>
+
+<div id="summary" class="mid"></div>
+<div id="curve_chart" class="cent" style="width: 900px; height: 500px"></div>
+<div id="output"></div>
+
+<script>
+
+//historic btc data
+var btc = [
+{"date":"03/05/2015", "btcusd":240.51}, 
+{"date":"04/05/2015", "btcusd":236.17}, 
+{"date":"05/05/2015", "btcusd":234.66}, 
+{"date":"06/05/2015", "btcusd":235.79}, 
+{"date":"07/05/2015", "btcusd":233.99}, 
+{"date":"08/05/2015", "btcusd":244.72}, 
+{"date":"09/05/2015", "btcusd":241.08}, 
+{"date":"10/05/2015", "btcusd":239.35}, 
+{"date":"11/05/2015", "btcusd":244.19}, 
+{"date":"12/05/2015", "btcusd":241.51}, 
+{"date":"13/05/2015", "btcusd":242.72}, 
+{"date":"14/05/2015", "btcusd":238.32}, 
+{"date":"15/05/2015", "btcusd":237.6}, 
+{"date":"16/05/2015", "btcusd":236.63}, 
+{"date":"17/05/2015", "btcusd":235.78}, 
+{"date":"18/05/2015", "btcusd":236.45}, 
+{"date":"19/05/2015", "btcusd":232.04}, 
+{"date":"20/05/2015", "btcusd":234.6}, 
+{"date":"21/05/2015", "btcusd":236}, 
+{"date":"22/05/2015", "btcusd":240.5}, 
+{"date":"23/05/2015", "btcusd":238.77}, 
+{"date":"24/05/2015", "btcusd":240.46}, 
+{"date":"25/05/2015", "btcusd":235.65}, 
+{"date":"26/05/2015", "btcusd":235.94}, 
+{"date":"27/05/2015", "btcusd":235}, 
+{"date":"28/05/2015", "btcusd":236.48}, 
+{"date":"29/05/2015", "btcusd":235.87}, 
+{"date":"30/05/2015", "btcusd":231.12}, 
+{"date":"31/05/2015", "btcusd":231.95}, 
+{"date":"01/06/2015", "btcusd":222.4}, 
+{"date":"02/06/2015", "btcusd":224.83}, 
+{"date":"03/06/2015", "btcusd":226.29}, 
+{"date":"04/06/2015", "btcusd":225.54}, 
+{"date":"05/06/2015", "btcusd":224.15}, 
+{"date":"06/06/2015", "btcusd":224.49}, 
+{"date":"07/06/2015", "btcusd":222.6}, 
+{"date":"08/06/2015", "btcusd":228}, 
+{"date":"09/06/2015", "btcusd":230.1}, 
+{"date":"10/06/2015", "btcusd":228.01}, 
+{"date":"11/06/2015", "btcusd":229}, 
+{"date":"12/06/2015", "btcusd":229.98}, 
+{"date":"13/06/2015", "btcusd":230.22}, 
+{"date":"14/06/2015", "btcusd":232.05}, 
+{"date":"15/06/2015", "btcusd":236.46}, 
+{"date":"16/06/2015", "btcusd":245.35}, 
+{"date":"17/06/2015", "btcusd":249.96}, 
+{"date":"18/06/2015", "btcusd":248.25}, 
+{"date":"19/06/2015", "btcusd":246.45}, 
+{"date":"20/06/2015", "btcusd":244.08}, 
+{"date":"21/06/2015", "btcusd":242.47}, 
+{"date":"22/06/2015", "btcusd":246.35}, 
+{"date":"23/06/2015", "btcusd":243.92}, 
+{"date":"24/06/2015", "btcusd":240.64}, 
+{"date":"25/06/2015", "btcusd":241.92}, 
+{"date":"26/06/2015", "btcusd":241.19}, 
+{"date":"27/06/2015", "btcusd":248.5}, 
+{"date":"28/06/2015", "btcusd":248.76}, 
+{"date":"29/06/2015", "btcusd":253.8}, 
+{"date":"30/06/2015", "btcusd":262.53}, 
+{"date":"01/07/2015", "btcusd":257.85}, 
+{"date":"02/07/2015", "btcusd":255.06}, 
+{"date":"03/07/2015", "btcusd":255.1}, 
+{"date":"04/07/2015", "btcusd":257.92}, 
+{"date":"05/07/2015", "btcusd":270.92}, 
+{"date":"06/07/2015", "btcusd":273.37}, 
+{"date":"07/07/2015", "btcusd":267.26}, 
+{"date":"08/07/2015", "btcusd":269.68}, 
+{"date":"09/07/2015", "btcusd":270.68}, 
+{"date":"10/07/2015", "btcusd":286.98}, 
+{"date":"11/07/2015", "btcusd":293.5}, 
+{"date":"12/07/2015", "btcusd":309.3}, 
+{"date":"13/07/2015", "btcusd":289.9}, 
+{"date":"14/07/2015", "btcusd":292.87}, 
+{"date":"15/07/2015", "btcusd":290.95}, 
+{"date":"16/07/2015", "btcusd":275.76}, 
+{"date":"17/07/2015", "btcusd":277.99}, 
+{"date":"18/07/2015", "btcusd":278.08}, 
+{"date":"19/07/2015", "btcusd":276.09}, 
+{"date":"20/07/2015", "btcusd":278.26}, 
+{"date":"21/07/2015", "btcusd":278.97}, 
+{"date":"22/07/2015", "btcusd":277.54}, 
+{"date":"23/07/2015", "btcusd":276.64}, 
+{"date":"24/07/2015", "btcusd":287.3}, 
+{"date":"25/07/2015", "btcusd":287.12}, 
+{"date":"26/07/2015", "btcusd":292.33}, 
+{"date":"27/07/2015", "btcusd":290.79}, 
+{"date":"28/07/2015", "btcusd":295.24}, 
+{"date":"29/07/2015", "btcusd":290.7}, 
+{"date":"30/07/2015", "btcusd":287.56}, 
+{"date":"31/07/2015", "btcusd":284.78}, 
+{"date":"01/08/2015", "btcusd":280.72}, 
+{"date":"02/08/2015", "btcusd":280.69}, 
+{"date":"03/08/2015", "btcusd":284.39}, 
+{"date":"04/08/2015", "btcusd":285}, 
+{"date":"05/08/2015", "btcusd":282.69}, 
+{"date":"06/08/2015", "btcusd":277.1}, 
+{"date":"07/08/2015", "btcusd":279.39}, 
+{"date":"08/08/2015", "btcusd":269.89}, 
+{"date":"09/08/2015", "btcusd":265.42}, 
+{"date":"10/08/2015", "btcusd":264.07}, 
+{"date":"11/08/2015", "btcusd":265.85}, 
+{"date":"12/08/2015", "btcusd":267.89}, 
+{"date":"13/08/2015", "btcusd":265.97}, 
+{"date":"14/08/2015", "btcusd":266.99}, 
+{"date":"15/08/2015", "btcusd":265.41}, 
+{"date":"16/08/2015", "btcusd":257.47}, 
+{"date":"17/08/2015", "btcusd":257.45}, 
+{"date":"18/08/2015", "btcusd":253.91}, 
+{"date":"19/08/2015", "btcusd":233.29}, 
+{"date":"20/08/2015", "btcusd":233.23}, 
+{"date":"21/08/2015", "btcusd":233.59}, 
+{"date":"22/08/2015", "btcusd":226.04}, 
+{"date":"23/08/2015", "btcusd":228.68}, 
+{"date":"24/08/2015", "btcusd":213.24}, 
+{"date":"25/08/2015", "btcusd":222.02}, 
+{"date":"26/08/2015", "btcusd":228.84}, 
+{"date":"27/08/2015", "btcusd":228.27}, 
+{"date":"28/08/2015", "btcusd":234.17}, 
+{"date":"29/08/2015", "btcusd":228.22}, 
+{"date":"30/08/2015", "btcusd":226.47}, 
+{"date":"31/08/2015", "btcusd":230.94}, 
+{"date":"01/09/2015", "btcusd":228.32}, 
+{"date":"02/09/2015", "btcusd":230.68}, 
+{"date":"03/09/2015", "btcusd":227.42}, 
+{"date":"04/09/2015", "btcusd":230.8}, 
+{"date":"05/09/2015", "btcusd":234.67}, 
+{"date":"06/09/2015", "btcusd":240.2}, 
+{"date":"07/09/2015", "btcusd":241.31}, 
+{"date":"08/09/2015", "btcusd":243.08}, 
+{"date":"09/09/2015", "btcusd":240.08}, 
+{"date":"10/09/2015", "btcusd":239.68}, 
+{"date":"11/09/2015", "btcusd":239.93}, 
+{"date":"12/09/2015", "btcusd":235.13}, 
+{"date":"13/09/2015", "btcusd":229.86}, 
+{"date":"14/09/2015", "btcusd":230.88}, 
+{"date":"15/09/2015", "btcusd":230}, 
+{"date":"16/09/2015", "btcusd":227.86}, 
+{"date":"17/09/2015", "btcusd":234}, 
+{"date":"18/09/2015", "btcusd":232.99}, 
+{"date":"19/09/2015", "btcusd":230.71}, 
+{"date":"20/09/2015", "btcusd":230.2}, 
+{"date":"21/09/2015", "btcusd":226.56}, 
+{"date":"22/09/2015", "btcusd":229.43}, 
+{"date":"23/09/2015", "btcusd":229.95}, 
+{"date":"24/09/2015", "btcusd":233.9}, 
+{"date":"25/09/2015", "btcusd":235.79}, 
+{"date":"26/09/2015", "btcusd":233.76}, 
+{"date":"27/09/2015", "btcusd":232.85}, 
+{"date":"28/09/2015", "btcusd":238.94}, 
+{"date":"29/09/2015", "btcusd":237.68}, 
+{"date":"30/09/2015", "btcusd":237.91}, 
+{"date":"01/10/2015", "btcusd":238.98}, 
+{"date":"02/10/2015", "btcusd":237.78}, 
+{"date":"03/10/2015", "btcusd":239.17}, 
+{"date":"04/10/2015", "btcusd":239.47}, 
+{"date":"05/10/2015", "btcusd":239.22}, 
+{"date":"06/10/2015", "btcusd":246.67}, 
+{"date":"07/10/2015", "btcusd":245.25}, 
+{"date":"08/10/2015", "btcusd":243.91}, 
+{"date":"09/10/2015", "btcusd":244.78}, 
+{"date":"10/10/2015", "btcusd":245.79}, 
+{"date":"11/10/2015", "btcusd":248.08}, 
+{"date":"12/10/2015", "btcusd":246.63}, 
+{"date":"13/10/2015", "btcusd":249.58}, 
+{"date":"14/10/2015", "btcusd":254.6}, 
+{"date":"15/10/2015", "btcusd":254.73}, 
+{"date":"16/10/2015", "btcusd":262.31}, 
+{"date":"17/10/2015", "btcusd":269.07}, 
+{"date":"18/10/2015", "btcusd":262.44}, 
+{"date":"19/10/2015", "btcusd":264.16}, 
+{"date":"20/10/2015", "btcusd":269.8}, 
+{"date":"21/10/2015", "btcusd":269.1}, 
+{"date":"22/10/2015", "btcusd":273.95}, 
+{"date":"23/10/2015", "btcusd":277.43}, 
+{"date":"24/10/2015", "btcusd":279.9}, 
+{"date":"25/10/2015", "btcusd":295.01}, 
+{"date":"26/10/2015", "btcusd":284.95}, 
+{"date":"27/10/2015", "btcusd":294.73}, 
+{"date":"28/10/2015", "btcusd":298.95}, 
+{"date":"29/10/2015", "btcusd":310.36}, 
+{"date":"30/10/2015", "btcusd":329.2}, 
+{"date":"31/10/2015", "btcusd":310.92}, 
+{"date":"01/11/2015", "btcusd":311.5}, 
+{"date":"02/11/2015", "btcusd":340.69}, 
+{"date":"03/11/2015", "btcusd":409}, 
+{"date":"04/11/2015", "btcusd":437.05}, 
+{"date":"05/11/2015", "btcusd":400}, 
+{"date":"06/11/2015", "btcusd":388.38}, 
+{"date":"07/11/2015", "btcusd":387.38}, 
+{"date":"08/11/2015", "btcusd":381.51}, 
+{"date":"09/11/2015", "btcusd":378.8}, 
+{"date":"10/11/2015", "btcusd":353.58}, 
+{"date":"11/11/2015", "btcusd":309.9}, 
+{"date":"12/11/2015", "btcusd":331.6}, 
+{"date":"13/11/2015", "btcusd":332.2}, 
+{"date":"14/11/2015", "btcusd":331.9}, 
+{"date":"15/11/2015", "btcusd":322.33}, 
+{"date":"16/11/2015", "btcusd":329.32}, 
+{"date":"17/11/2015", "btcusd":335.95}, 
+{"date":"18/11/2015", "btcusd":334.46}, 
+{"date":"19/11/2015", "btcusd":329}, 
+{"date":"20/11/2015", "btcusd":320.62}, 
+{"date":"21/11/2015", "btcusd":325.56}, 
+{"date":"22/11/2015", "btcusd":322.33}, 
+{"date":"23/11/2015", "btcusd":324.49}, 
+{"date":"24/11/2015", "btcusd":321.1}, 
+{"date":"25/11/2015", "btcusd":325}, 
+{"date":"26/11/2015", "btcusd":348}, 
+{"date":"27/11/2015", "btcusd":359.54}, 
+{"date":"28/11/2015", "btcusd":353.88}, 
+{"date":"29/11/2015", "btcusd":363.98}, 
+{"date":"30/11/2015", "btcusd":372.53}, 
+{"date":"01/12/2015", "btcusd":359.32}, 
+{"date":"02/12/2015", "btcusd":360.98}, 
+{"date":"03/12/2015", "btcusd":362.49}, 
+{"date":"04/12/2015", "btcusd":360.88}, 
+{"date":"05/12/2015", "btcusd":377.72}, 
+{"date":"06/12/2015", "btcusd":390.04}, 
+{"date":"07/12/2015", "btcusd":395.58}, 
+{"date":"08/12/2015", "btcusd":394.99}, 
+{"date":"09/12/2015", "btcusd":414.01}, 
+{"date":"10/12/2015", "btcusd":415.64}, 
+{"date":"11/12/2015", "btcusd":444.29}, 
+{"date":"12/12/2015", "btcusd":426.06}, 
+{"date":"13/12/2015", "btcusd":438.79}, 
+{"date":"14/12/2015", "btcusd":445.6}, 
+{"date":"15/12/2015", "btcusd":459.48}, 
+{"date":"16/12/2015", "btcusd":454.43}, 
+{"date":"17/12/2015", "btcusd":453.39}, 
+{"date":"18/12/2015", "btcusd":458.95}, 
+{"date":"19/12/2015", "btcusd":461.16}, 
+{"date":"20/12/2015", "btcusd":434.98}, 
+{"date":"21/12/2015", "btcusd":438.7}, 
+{"date":"22/12/2015", "btcusd":435.98}, 
+{"date":"23/12/2015", "btcusd":441.4}, 
+{"date":"24/12/2015", "btcusd":453.95}, 
+{"date":"25/12/2015", "btcusd":454.98}, 
+{"date":"26/12/2015", "btcusd":417.99}, 
+{"date":"27/12/2015", "btcusd":418.46}, 
+{"date":"28/12/2015", "btcusd":423.98}, 
+{"date":"29/12/2015", "btcusd":431.13}, 
+{"date":"30/12/2015", "btcusd":428}, 
+{"date":"31/12/2015", "btcusd":429.34}, 
+{"date":"01/01/2016", "btcusd":432.33}, 
+{"date":"02/01/2016", "btcusd":433.94}, 
+{"date":"03/01/2016", "btcusd":428.13}, 
+{"date":"04/01/2016", "btcusd":433}, 
+{"date":"05/01/2016", "btcusd":431.9}, 
+{"date":"06/01/2016", "btcusd":430.75}, 
+{"date":"07/01/2016", "btcusd":453.71}, 
+{"date":"08/01/2016", "btcusd":447.04}, 
+{"date":"09/01/2016", "btcusd":450.15}, 
+{"date":"10/01/2016", "btcusd":446.24}, 
+{"date":"11/01/2016", "btcusd":447.11}, 
+{"date":"12/01/2016", "btcusd":446.66}, 
+{"date":"13/01/2016", "btcusd":429.57}, 
+{"date":"14/01/2016", "btcusd":431.9}, 
+{"date":"15/01/2016", "btcusd":391.62}, 
+{"date":"16/01/2016", "btcusd":370.4}, 
+{"date":"17/01/2016", "btcusd":385.45}, 
+{"date":"18/01/2016", "btcusd":385.28}, 
+{"date":"19/01/2016", "btcusd":378.66}, 
+{"date":"20/01/2016", "btcusd":408.33}, 
+{"date":"21/01/2016", "btcusd":408}, 
+{"date":"22/01/2016", "btcusd":385.7}, 
+{"date":"23/01/2016", "btcusd":388.5}, 
+{"date":"24/01/2016", "btcusd":404.75}, 
+{"date":"25/01/2016", "btcusd":387.09}, 
+{"date":"26/01/2016", "btcusd":394.12}, 
+{"date":"27/01/2016", "btcusd":394.45}, 
+{"date":"28/01/2016", "btcusd":382.44}, 
+{"date":"29/01/2016", "btcusd":377.26}, 
+{"date":"30/01/2016", "btcusd":378.24}, 
+{"date":"31/01/2016", "btcusd":376.86}, 
+{"date":"01/02/2016", "btcusd":372}, 
+{"date":"02/02/2016", "btcusd":373.48}, 
+{"date":"03/02/2016", "btcusd":368.38}, 
+{"date":"04/02/2016", "btcusd":385.06}, 
+{"date":"05/02/2016", "btcusd":386.49}, 
+{"date":"06/02/2016", "btcusd":373.04}, 
+{"date":"07/02/2016", "btcusd":373.74}, 
+{"date":"08/02/2016", "btcusd":375.8}, 
+{"date":"09/02/2016", "btcusd":372.61}, 
+{"date":"10/02/2016", "btcusd":378.98}, 
+{"date":"11/02/2016", "btcusd":376.75}, 
+{"date":"12/02/2016", "btcusd":381.46}, 
+{"date":"13/02/2016", "btcusd":388.6}, 
+{"date":"14/02/2016", "btcusd":402.38}, 
+{"date":"15/02/2016", "btcusd":402.64}, 
+{"date":"16/02/2016", "btcusd":406.69}, 
+{"date":"17/02/2016", "btcusd":418.04}, 
+{"date":"18/02/2016", "btcusd":418.97}, 
+{"date":"19/02/2016", "btcusd":418.02}, 
+{"date":"20/02/2016", "btcusd":439.48}, 
+{"date":"21/02/2016", "btcusd":434.67}, 
+{"date":"22/02/2016", "btcusd":438.5}, 
+{"date":"23/02/2016", "btcusd":417}, 
+{"date":"24/02/2016", "btcusd":423.1}, 
+{"date":"25/02/2016", "btcusd":421.4}, 
+{"date":"26/02/2016", "btcusd":424.34}, 
+{"date":"27/02/2016", "btcusd":432}, 
+{"date":"28/02/2016", "btcusd":433.47}, 
+{"date":"29/02/2016", "btcusd":436.18}, 
+{"date":"01/03/2016", "btcusd":431.87}, 
+{"date":"02/03/2016", "btcusd":429.99}, 
+{"date":"03/03/2016", "btcusd":421.44}, 
+{"date":"04/03/2016", "btcusd":416.48}, 
+{"date":"05/03/2016", "btcusd":401}, 
+{"date":"06/03/2016", "btcusd":408.86}, 
+{"date":"07/03/2016", "btcusd":411.94}, 
+{"date":"08/03/2016", "btcusd":412.39}, 
+{"date":"09/03/2016", "btcusd":413.1}, 
+{"date":"10/03/2016", "btcusd":416}, 
+{"date":"11/03/2016", "btcusd":421.22}, 
+{"date":"12/03/2016", "btcusd":410}, 
+{"date":"13/03/2016", "btcusd":412.44}, 
+{"date":"14/03/2016", "btcusd":413.89}, 
+{"date":"15/03/2016", "btcusd":414.78}, 
+{"date":"16/03/2016", "btcusd":415.99}, 
+{"date":"17/03/2016", "btcusd":418.64}, 
+{"date":"18/03/2016", "btcusd":408.87}, 
+{"date":"19/03/2016", "btcusd":405.59}, 
+{"date":"20/03/2016", "btcusd":410.77}, 
+{"date":"21/03/2016", "btcusd":410.49}, 
+{"date":"22/03/2016", "btcusd":415.35}, 
+{"date":"23/03/2016", "btcusd":417.8}, 
+{"date":"24/03/2016", "btcusd":416.47}, 
+{"date":"25/03/2016", "btcusd":416.44}, 
+{"date":"26/03/2016", "btcusd":415.71}, 
+{"date":"27/03/2016", "btcusd":426.8}, 
+{"date":"28/03/2016", "btcusd":422.96}, 
+{"date":"29/03/2016", "btcusd":414}, 
+{"date":"30/03/2016", "btcusd":412.35}, 
+{"date":"31/03/2016", "btcusd":416.94}, 
+{"date":"01/04/2016", "btcusd":416.25}, 
+{"date":"02/04/2016", "btcusd":418.07}, 
+{"date":"03/04/2016", "btcusd":418.07}, 
+{"date":"04/04/2016", "btcusd":418.99}, 
+{"date":"05/04/2016", "btcusd":421.77}, 
+{"date":"06/04/2016", "btcusd":421.09}, 
+{"date":"07/04/2016", "btcusd":420.33}, 
+{"date":"08/04/2016", "btcusd":422.2}, 
+{"date":"09/04/2016", "btcusd":417.73}, 
+{"date":"10/04/2016", "btcusd":421.63}, 
+{"date":"11/04/2016", "btcusd":420.69}, 
+{"date":"12/04/2016", "btcusd":425.89}, 
+{"date":"13/04/2016", "btcusd":424.61}, 
+{"date":"14/04/2016", "btcusd":423.76}, 
+{"date":"15/04/2016", "btcusd":429.09}, 
+{"date":"16/04/2016", "btcusd":429.43}, 
+{"date":"17/04/2016", "btcusd":425.71}, 
+{"date":"18/04/2016", "btcusd":427.28}, 
+{"date":"19/04/2016", "btcusd":435.91}, 
+{"date":"20/04/2016", "btcusd":442.34}, 
+{"date":"21/04/2016", "btcusd":451}, 
+{"date":"22/04/2016", "btcusd":447.25}, 
+{"date":"23/04/2016", "btcusd":451.29}, 
+{"date":"24/04/2016", "btcusd":459.4}, 
+{"date":"25/04/2016", "btcusd":463.86}, 
+{"date":"26/04/2016", "btcusd":467.98}, 
+{"date":"27/04/2016", "btcusd":447.31}, 
+{"date":"28/04/2016", "btcusd":450}, 
+{"date":"29/04/2016", "btcusd":456.16}, 
+{"date":"30/04/2016", "btcusd":447.17}, 
+{"date":"01/05/2016", "btcusd":451.9}, 
+{"date":"02/05/2016", "btcusd":443.9}, 
+{"date":"03/05/2016", "btcusd":450.96}, 
+{"date":"04/05/2016", "btcusd":447.37}, 
+{"date":"05/05/2016", "btcusd":448.51}, 
+{"date":"06/05/2016", "btcusd":460.91}, 
+{"date":"07/05/2016", "btcusd":459.04}, 
+{"date":"08/05/2016", "btcusd":457.82}, 
+{"date":"09/05/2016", "btcusd":461.63}, 
+{"date":"10/05/2016", "btcusd":450}, 
+{"date":"11/05/2016", "btcusd":452.51}, 
+{"date":"12/05/2016", "btcusd":454.7}, 
+{"date":"13/05/2016", "btcusd":456.82}, 
+{"date":"14/05/2016", "btcusd":455.65}, 
+{"date":"15/05/2016", "btcusd":457.08}, 
+{"date":"16/05/2016", "btcusd":454.88}, 
+{"date":"17/05/2016", "btcusd":452.89}, 
+{"date":"18/05/2016", "btcusd":452.9}, 
+{"date":"19/05/2016", "btcusd":441.87}, 
+{"date":"20/05/2016", "btcusd":441.25}, 
+{"date":"21/05/2016", "btcusd":443.89}, 
+{"date":"22/05/2016", "btcusd":438}, 
+{"date":"23/05/2016", "btcusd":442.17}, 
+{"date":"24/05/2016", "btcusd":445.34}, 
+{"date":"25/05/2016", "btcusd":447.94}, 
+{"date":"26/05/2016", "btcusd":452.49}, 
+{"date":"27/05/2016", "btcusd":470.29}, 
+{"date":"28/05/2016", "btcusd":522.43}, 
+{"date":"29/05/2016", "btcusd":512.16}, 
+{"date":"30/05/2016", "btcusd":525.15}, 
+{"date":"31/05/2016", "btcusd":531.15}, 
+{"date":"01/06/2016", "btcusd":539.47}, 
+{"date":"02/06/2016", "btcusd":539.99}, 
+{"date":"03/06/2016", "btcusd":568}, 
+{"date":"04/06/2016", "btcusd":573.74}, 
+{"date":"05/06/2016", "btcusd":574.02}, 
+{"date":"06/06/2016", "btcusd":584.5}, 
+{"date":"07/06/2016", "btcusd":577.54}, 
+{"date":"08/06/2016", "btcusd":578.68}, 
+{"date":"09/06/2016", "btcusd":575.2941375}, 
+{"date":"10/06/2016", "btcusd":577.549875}, 
+{"date":"11/06/2016", "btcusd":594.4399875}, 
+{"date":"12/06/2016", "btcusd":664.8465}, 
+{"date":"13/06/2016", "btcusd":702.0665}, 
+{"date":"14/06/2016", "btcusd":685.241874999999}, 
+{"date":"15/06/2016", "btcusd":692.289625}, 
+{"date":"16/06/2016", "btcusd":762.43005}, 
+{"date":"17/06/2016", "btcusd":743.9164}, 
+{"date":"18/06/2016", "btcusd":754.36625}, 
+{"date":"19/06/2016", "btcusd":760.8168}, 
+{"date":"20/06/2016", "btcusd":729.192585714285}, 
+{"date":"21/06/2016", "btcusd":665.9586125}, 
+{"date":"22/06/2016", "btcusd":587.4542375}, 
+{"date":"23/06/2016", "btcusd":624.542}, 
+{"date":"24/06/2016", "btcusd":660.60465}, 
+{"date":"25/06/2016", "btcusd":664.9068875}, 
+{"date":"26/06/2016", "btcusd":627.3926125}, 
+{"date":"27/06/2016", "btcusd":646.7030125}, 
+{"date":"28/06/2016", "btcusd":646.378475}, 
+{"date":"29/06/2016", "btcusd":637.959625}, 
+{"date":"30/06/2016", "btcusd":671.407925}, 
+{"date":"01/07/2016", "btcusd":675.1863375}, 
+{"date":"02/07/2016", "btcusd":701.7121125}, 
+{"date":"03/07/2016", "btcusd":658.4175}, 
+{"date":"04/07/2016", "btcusd":676.3294375}, 
+{"date":"05/07/2016", "btcusd":666.4855875}, 
+{"date":"06/07/2016", "btcusd":673.786825}, 
+{"date":"07/07/2016", "btcusd":636.3588625}, 
+{"date":"08/07/2016", "btcusd":659.5552375}, 
+{"date":"09/07/2016", "btcusd":651.8649125}, 
+{"date":"10/07/2016", "btcusd":648.0949}, 
+{"date":"11/07/2016", "btcusd":647.9837}, 
+{"date":"12/07/2016", "btcusd":672.765312499999}, 
+{"date":"13/07/2016", "btcusd":657.4524875}, 
+{"date":"14/07/2016", "btcusd":658.8316125}, 
+{"date":"15/07/2016", "btcusd":664.57145}, 
+{"date":"16/07/2016", "btcusd":662.15335}, 
+{"date":"17/07/2016", "btcusd":675.45905}, 
+{"date":"18/07/2016", "btcusd":673.2056375}, 
+{"date":"19/07/2016", "btcusd":672.8432}, 
+{"date":"20/07/2016", "btcusd":665.643125}, 
+{"date":"21/07/2016", "btcusd":664.882075}, 
+{"date":"22/07/2016", "btcusd":651.5813625}, 
+{"date":"23/07/2016", "btcusd":655.8469125}, 
+{"date":"24/07/2016", "btcusd":661.4130125}, 
+{"date":"25/07/2016", "btcusd":654.695449999999}, 
+{"date":"26/07/2016", "btcusd":655.0654625}, 
+{"date":"27/07/2016", "btcusd":654.9810375}, 
+{"date":"28/07/2016", "btcusd":655.32875}, 
+{"date":"29/07/2016", "btcusd":656.887612499999}, 
+{"date":"30/07/2016", "btcusd":654.7369625}, 
+{"date":"31/07/2016", "btcusd":628.015375}, 
+{"date":"01/08/2016", "btcusd":606.322342857142}, 
+{"date":"02/08/2016", "btcusd":515.061899999999}, 
+{"date":"03/08/2016", "btcusd":565.051671428571}, 
+{"date":"04/08/2016", "btcusd":577.315771428571}, 
+{"date":"05/08/2016", "btcusd":576.559085714285}, 
+{"date":"06/08/2016", "btcusd":588.231271428571}, 
+{"date":"07/08/2016", "btcusd":594.274885714285}, 
+{"date":"08/08/2016", "btcusd":592.6975}, 
+{"date":"09/08/2016", "btcusd":588.7753875}, 
+{"date":"10/08/2016", "btcusd":592.1899}, 
+{"date":"11/08/2016", "btcusd":589.24185}, 
+{"date":"12/08/2016", "btcusd":587.7556}, 
+{"date":"13/08/2016", "btcusd":586.4345375}, 
+{"date":"14/08/2016", "btcusd":570.976414285714}, 
+{"date":"15/08/2016", "btcusd":570.142224999999}, 
+{"date":"16/08/2016", "btcusd":581.1185875}, 
+{"date":"17/08/2016", "btcusd":575.518}, 
+{"date":"18/08/2016", "btcusd":576.0360875}, 
+{"date":"19/08/2016", "btcusd":576.657075}, 
+{"date":"20/08/2016", "btcusd":583.2078625}, 
+{"date":"21/08/2016", "btcusd":582.821675}, 
+{"date":"22/08/2016", "btcusd":588.9727625}, 
+{"date":"23/08/2016", "btcusd":586.18515}, 
+{"date":"24/08/2016", "btcusd":582.8479875}, 
+{"date":"25/08/2016", "btcusd":579.86365}, 
+{"date":"26/08/2016", "btcusd":581.07245}, 
+{"date":"27/08/2016", "btcusd":571.5419875}, 
+{"date":"28/08/2016", "btcusd":576.534}, 
+{"date":"29/08/2016", "btcusd":575.2244125}, 
+{"date":"30/08/2016", "btcusd":578.616575}, 
+{"date":"31/08/2016", "btcusd":574.8279375}, 
+{"date":"01/09/2016", "btcusd":572.818375}, 
+{"date":"02/09/2016", "btcusd":576.218}, 
+{"date":"03/09/2016", "btcusd":600.8860875}, 
+{"date":"04/09/2016", "btcusd":610.59875}, 
+{"date":"05/09/2016", "btcusd":608.10975}, 
+{"date":"06/09/2016", "btcusd":611.097475}, 
+{"date":"07/09/2016", "btcusd":614.4637625}, 
+{"date":"08/09/2016", "btcusd":627.777875}, 
+{"date":"09/09/2016", "btcusd":625.070899999999}, 
+{"date":"10/09/2016", "btcusd":625.7635}, 
+{"date":"11/09/2016", "btcusd":608.15855}, 
+{"date":"12/09/2016", "btcusd":609.6705}, 
+{"date":"13/09/2016", "btcusd":610.928125}, 
+{"date":"14/09/2016", "btcusd":612.0847375}, 
+{"date":"15/09/2016", "btcusd":610.386125}, 
+{"date":"16/09/2016", "btcusd":609.11465}, 
+{"date":"17/09/2016", "btcusd":608.006875}, 
+{"date":"18/09/2016", "btcusd":611.5859}, 
+{"date":"19/09/2016", "btcusd":610.1965}, 
+{"date":"20/09/2016", "btcusd":609.74875}, 
+{"date":"21/09/2016", "btcusd":598.884875}, 
+{"date":"22/09/2016", "btcusd":597.4226}, 
+{"date":"23/09/2016", "btcusd":604.2225}, 
+{"date":"24/09/2016", "btcusd":603.8854}, 
+{"date":"25/09/2016", "btcusd":601.7472375}, 
+{"date":"26/09/2016", "btcusd":608.1469625}, 
+{"date":"27/09/2016", "btcusd":605.9622125}, 
+{"date":"28/09/2016", "btcusd":605.679475}, 
+{"date":"29/09/2016", "btcusd":606.36375}, 
+{"date":"30/09/2016", "btcusd":609.3962875}, 
+{"date":"01/10/2016", "btcusd":614.8238}, 
+{"date":"02/10/2016", "btcusd":610.518912499999}, 
+{"date":"03/10/2016", "btcusd":611.8511}, 
+{"date":"04/10/2016", "btcusd":609.6248125}, 
+{"date":"05/10/2016", "btcusd":612.3522875}, 
+{"date":"06/10/2016", "btcusd":612.08875}, 
+{"date":"07/10/2016", "btcusd":617.21035}, 
+{"date":"08/10/2016", "btcusd":618.046}, 
+{"date":"09/10/2016", "btcusd":615.65675}, 
+{"date":"10/10/2016", "btcusd":617.54825}, 
+{"date":"11/10/2016", "btcusd":639.30995}, 
+{"date":"12/10/2016", "btcusd":635.0139375}, 
+{"date":"13/10/2016", "btcusd":635.9650875}, 
+{"date":"14/10/2016", "btcusd":639.565642857142}, 
+{"date":"15/10/2016", "btcusd":637.949857142857}, 
+{"date":"16/10/2016", "btcusd":641.425125}, 
+{"date":"17/10/2016", "btcusd":638.1833875}, 
+{"date":"18/10/2016", "btcusd":636.2965}, 
+{"date":"19/10/2016", "btcusd":629.253675}, 
+{"date":"20/10/2016", "btcusd":630.22705}, 
+{"date":"21/10/2016", "btcusd":631.9242125}, 
+{"date":"22/10/2016", "btcusd":655.4886625}, 
+{"date":"23/10/2016", "btcusd":653.0028625}, 
+{"date":"24/10/2016", "btcusd":651.396425}, 
+{"date":"25/10/2016", "btcusd":655.31995}, 
+{"date":"26/10/2016", "btcusd":672.2214125}, 
+{"date":"27/10/2016", "btcusd":682.2239625}, 
+{"date":"28/10/2016", "btcusd":687.6883375}, 
+{"date":"29/10/2016", "btcusd":714.89545}, 
+{"date":"30/10/2016", "btcusd":698.003399999999}, 
+{"date":"31/10/2016", "btcusd":702.0015125}, 
+{"date":"01/11/2016", "btcusd":728.2068875}, 
+{"date":"02/11/2016", "btcusd":733.336125}, 
+{"date":"03/11/2016", "btcusd":686.170875}, 
+{"date":"04/11/2016", "btcusd":703.6940875}, 
+{"date":"05/11/2016", "btcusd":704.7909}, 
+{"date":"06/11/2016", "btcusd":712.00325}, 
+{"date":"07/11/2016", "btcusd":703.819}, 
+{"date":"08/11/2016", "btcusd":708.974875}, 
+{"date":"09/11/2016", "btcusd":720.9301}, 
+{"date":"10/11/2016", "btcusd":713.690125}, 
+{"date":"11/11/2016", "btcusd":715.4593}, 
+{"date":"12/11/2016", "btcusd":703.718}, 
+{"date":"13/11/2016", "btcusd":701.901125}, 
+{"date":"14/11/2016", "btcusd":706.467875}, 
+{"date":"15/11/2016", "btcusd":710.910125}, 
+{"date":"16/11/2016", "btcusd":736.914375}, 
+{"date":"17/11/2016", "btcusd":736.9615}, 
+{"date":"18/11/2016", "btcusd":747.5217625}, 
+{"date":"19/11/2016", "btcusd":750.030875}, 
+{"date":"20/11/2016", "btcusd":729.066625}, 
+{"date":"21/11/2016", "btcusd":738.537625}, 
+{"date":"22/11/2016", "btcusd":748.749375}, 
+{"date":"23/11/2016", "btcusd":741.6384}, 
+{"date":"24/11/2016", "btcusd":737.450375}, 
+{"date":"25/11/2016", "btcusd":739.786125}, 
+{"date":"26/11/2016", "btcusd":733.673}, 
+{"date":"27/11/2016", "btcusd":727.9655}, 
+{"date":"28/11/2016", "btcusd":733.052124999999}, 
+{"date":"29/11/2016", "btcusd":732.712125}, 
+{"date":"30/11/2016", "btcusd":742.6967625}, 
+{"date":"01/12/2016", "btcusd":752.246125}, 
+{"date":"02/12/2016", "btcusd":772.43725}, 
+{"date":"03/12/2016", "btcusd":764.339625}, 
+{"date":"04/12/2016", "btcusd":764.81625}, 
+{"date":"05/12/2016", "btcusd":754.639749999999}, 
+{"date":"06/12/2016", "btcusd":756.6215}, 
+{"date":"07/12/2016", "btcusd":766.1166375}, 
+{"date":"08/12/2016", "btcusd":769.72975}, 
+{"date":"09/12/2016", "btcusd":770.028125}, 
+{"date":"10/12/2016", "btcusd":773.40125}, 
+{"date":"11/12/2016", "btcusd":768.303125}, 
+{"date":"12/12/2016", "btcusd":777.006875}, 
+{"date":"13/12/2016", "btcusd":778.4935}, 
+{"date":"14/12/2016", "btcusd":774.897}, 
+{"date":"15/12/2016", "btcusd":776.75215}, 
+{"date":"16/12/2016", "btcusd":781.568375}, 
+{"date":"17/12/2016", "btcusd":788.7055}, 
+{"date":"18/12/2016", "btcusd":788.40575}, 
+{"date":"19/12/2016", "btcusd":789.524125}, 
+{"date":"20/12/2016", "btcusd":793.0901375}, 
+{"date":"21/12/2016", "btcusd":824.2189375}, 
+{"date":"22/12/2016", "btcusd":860.599875}, 
+{"date":"23/12/2016", "btcusd":901.3182375}, 
+{"date":"24/12/2016", "btcusd":891.6126125}, 
+{"date":"25/12/2016", "btcusd":886.900374999999}, 
+{"date":"26/12/2016", "btcusd":897.335375}, 
+{"date":"27/12/2016", "btcusd":930.376}, 
+{"date":"28/12/2016", "btcusd":967.480375}, 
+{"date":"29/12/2016", "btcusd":963.381625}, 
+{"date":"30/12/2016", "btcusd":952.156375}, 
+{"date":"31/12/2016", "btcusd":959.879875}, 
+{"date":"01/01/2017", "btcusd":997.729875}, 
+{"date":"02/01/2017", "btcusd":1015.9771125}, 
+{"date":"03/01/2017", "btcusd":1023.141875}, 
+{"date":"04/01/2017", "btcusd":1126.7633375}, 
+{"date":"05/01/2017", "btcusd":994.674875}, 
+{"date":"06/01/2017", "btcusd":883.099175}, 
+{"date":"07/01/2017", "btcusd":896.830375}, 
+{"date":"08/01/2017", "btcusd":908.1490375}, 
+{"date":"09/01/2017", "btcusd":894.18025}, 
+{"date":"10/01/2017", "btcusd":906.056914285714}, 
+{"date":"11/01/2017", "btcusd":785.2237375}, 
+{"date":"12/01/2017", "btcusd":803.372375}, 
+{"date":"13/01/2017", "btcusd":826.2956625}, 
+{"date":"14/01/2017", "btcusd":817.912875}, 
+{"date":"15/01/2017", "btcusd":822.2076}, 
+{"date":"16/01/2017", "btcusd":830.505125}, 
+{"date":"17/01/2017", "btcusd":903.84575}, 
+{"date":"18/01/2017", "btcusd":874.9949625}, 
+{"date":"19/01/2017", "btcusd":895.798875}, 
+{"date":"20/01/2017", "btcusd":893.6210875}, 
+{"date":"21/01/2017", "btcusd":920.4479}, 
+{"date":"22/01/2017", "btcusd":918.603625}, 
+{"date":"23/01/2017", "btcusd":922.0736125}, 
+{"date":"24/01/2017", "btcusd":890.320225}, 
+{"date":"25/01/2017", "btcusd":893.045625}, 
+{"date":"26/01/2017", "btcusd":915.95625}, 
+{"date":"27/01/2017", "btcusd":919.27975}, 
+{"date":"28/01/2017", "btcusd":920.31225}, 
+{"date":"29/01/2017", "btcusd":915.933}, 
+{"date":"30/01/2017", "btcusd":921.179325}, 
+{"date":"31/01/2017", "btcusd":964.706075}, 
+{"date":"01/02/2017", "btcusd":979.703874999999}, 
+{"date":"02/02/2017", "btcusd":1007.6137125}, 
+{"date":"03/02/2017", "btcusd":1013.027}, 
+{"date":"04/02/2017", "btcusd":1030.9994125}, 
+{"date":"05/02/2017", "btcusd":1014.837725}, 
+{"date":"06/02/2017", "btcusd":1024.01375}, 
+{"date":"07/02/2017", "btcusd":1050.11}, 
+{"date":"08/02/2017", "btcusd":1052.3766125}, 
+{"date":"09/02/2017", "btcusd":976.103}, 
+{"date":"10/02/2017", "btcusd":999.103499999999}, 
+{"date":"11/02/2017", "btcusd":1008.8466625}, 
+{"date":"12/02/2017", "btcusd":1000.604625}, 
+{"date":"13/02/2017", "btcusd":999.877375}, 
+{"date":"14/02/2017", "btcusd":1011.78025}, 
+{"date":"15/02/2017", "btcusd":1012.3259875}, 
+{"date":"16/02/2017", "btcusd":1035.20812499999}, 
+{"date":"17/02/2017", "btcusd":1055.53685}, 
+{"date":"18/02/2017", "btcusd":1056.63713749999}, 
+{"date":"19/02/2017", "btcusd":1052.77928571428}, 
+{"date":"20/02/2017", "btcusd":1084.7550125}, 
+{"date":"21/02/2017", "btcusd":1123.78842857142}, 
+{"date":"22/02/2017", "btcusd":1123.2231875}, 
+{"date":"23/02/2017", "btcusd":1172.01715}, 
+{"date":"24/02/2017", "btcusd":1174.86625}, 
+{"date":"25/02/2017", "btcusd":1150.60571428571}, 
+{"date":"26/02/2017", "btcusd":1175.04975}, 
+{"date":"27/02/2017", "btcusd":1190.75195}, 
+{"date":"28/02/2017", "btcusd":1187.56528571428}, 
+{"date":"01/03/2017", "btcusd":1222.4994}, 
+{"date":"02/03/2017", "btcusd":1259.41081666666}, 
+{"date":"03/03/2017", "btcusd":1285.14}, 
+{"date":"04/03/2017", "btcusd":1267.0272}, 
+{"date":"05/03/2017", "btcusd":1270.9333}, 
+{"date":"06/03/2017", "btcusd":1275.197375}, 
+{"date":"07/03/2017", "btcusd":1238.447}, 
+{"date":"08/03/2017", "btcusd":1157.3933}, 
+{"date":"09/03/2017", "btcusd":1192.46914285714}, 
+{"date":"10/03/2017", "btcusd":1098.61712857142}, 
+{"date":"11/03/2017", "btcusd":1179.159875}, 
+{"date":"12/03/2017", "btcusd":1227.494625}, 
+{"date":"13/03/2017", "btcusd":1239.816225}, 
+{"date":"14/03/2017", "btcusd":1245.37078571428}, 
+{"date":"15/03/2017", "btcusd":1257.399625}, 
+{"date":"16/03/2017", "btcusd":1180.94565714285}, 
+{"date":"17/03/2017", "btcusd":1091.1718875}, 
+{"date":"18/03/2017", "btcusd":952.2323625}, 
+{"date":"19/03/2017", "btcusd":1029.8008125}, 
+{"date":"20/03/2017", "btcusd":1049.0844875}, 
+{"date":"21/03/2017", "btcusd":1118.63004285714}, 
+{"date":"22/03/2017", "btcusd":1028.7268625}, 
+{"date":"23/03/2017", "btcusd":1038.789}, 
+{"date":"24/03/2017", "btcusd":941.919714285714}, 
+{"date":"25/03/2017", "btcusd":959.340085714285}, 
+{"date":"26/03/2017", "btcusd":956.7863125}, 
+{"date":"27/03/2017", "btcusd":1037.22924999999}, 
+{"date":"28/03/2017", "btcusd":1046.127625}, 
+{"date":"29/03/2017", "btcusd":1040.5755}, 
+{"date":"30/03/2017", "btcusd":1037.90455}, 
+{"date":"31/03/2017", "btcusd":1079.54931428571}, 
+{"date":"01/04/2017", "btcusd":1086.92957142857}, 
+{"date":"02/04/2017", "btcusd":1099.169125}, 
+{"date":"03/04/2017", "btcusd":1141.813}, 
+{"date":"04/04/2017", "btcusd":1141.6003625}, 
+{"date":"05/04/2017", "btcusd":1133.07931428571}, 
+{"date":"06/04/2017", "btcusd":1196.3079375}, 
+{"date":"07/04/2017", "btcusd":1190.45425}, 
+{"date":"08/04/2017", "btcusd":1181.1498375}, 
+{"date":"09/04/2017", "btcusd":1208.8005}, 
+{"date":"10/04/2017", "btcusd":1207.744875}, 
+{"date":"11/04/2017", "btcusd":1226.6170375}, 
+{"date":"12/04/2017", "btcusd":1218.92205}, 
+{"date":"13/04/2017", "btcusd":1180.0237125}, 
+{"date":"14/04/2017", "btcusd":1185.26005714285}, 
+{"date":"15/04/2017", "btcusd":1184.88067142857}, 
+{"date":"16/04/2017", "btcusd":1186.9274125}, 
+{"date":"17/04/2017", "btcusd":1205.634875}, 
+{"date":"18/04/2017", "btcusd":1216.18674285714}, 
+{"date":"19/04/2017", "btcusd":1217.9300875}, 
+{"date":"20/04/2017", "btcusd":1241.686325}, 
+{"date":"21/04/2017", "btcusd":1258.3614125}, 
+{"date":"22/04/2017", "btcusd":1261.311225}, 
+{"date":"23/04/2017", "btcusd":1257.9881125}, 
+{"date":"24/04/2017", "btcusd":1262.902775}, 
+{"date":"25/04/2017", "btcusd":1279.4146875}, 
+{"date":"26/04/2017", "btcusd":1309.109875}, 
+{"date":"27/04/2017", "btcusd":1345.3539125}, 
+{"date":"28/04/2017", "btcusd":1331.29442857142}, 
+{"date":"29/04/2017", "btcusd":1334.9790375}, 
+{"date":"30/04/2017", "btcusd":1353.0045}, 
+{"date":"01/05/2017", "btcusd":1417.1728125}
+];
+
+
+var i=0, j=0;
+var output = document.getElementById("output");
+var sumOutput = document.getElementById("summary");
+var t = {
+	t0: "<table>",
+	s: "<tr><td>",
+	i: "</td><td>",
+	e: "</td></tr>",
+	tn: "</table>"
+};
+var target = 1.03;
+var stoploss = 0.97;
+var oneDayTrigger = 1.02;
+
+//loop and analyse strategy
+var results = [];
+var bDateOk = true;
+for (i=1; i<btc.length; i++){
+	//date filter
+	isApostB(btc[i].date, "01/01/2015") && isApreB(btc[i].date, "01/03/2016") ? bDateOk = true :  bDateOk = false;
+	//isApostB(btc[i].date, "18/03/2017") ? bDateOk = true :  bDateOk = false;
+	
+	//buy action
+	if (btc[i].btcusd < oneDayTrigger * btc[i-1].btcusd && bDateOk) {
+	//if (true){
+		var toAdd = {};
+		toAdd.i = i;
+		toAdd.bdate = btc[i].date;
+		toAdd.buybu = r2dp(btc[i].btcusd);
+		results.push(toAdd);
+	}
+	
+	//sell if price is >x%
+	if (results.length > 0){
+		for (j=0; j<results.length; j++){
+			if (!results[j].sdate){
+				if (results[j].buybu * target < btc[i].btcusd || 
+				results[j].buybu * stoploss > btc[i].btcusd ) {
+					results[j].sdate = btc[i].date;
+					results[j].sellbu = r2dp(btc[i].btcusd);
+					results[j].selln = nDays(results[j].bdate, results[j].sdate);
+					results[j].rate = pc2dp( results[j].sellbu / results[j].buybu - 1 ) ;
+				}
+			}
+		}
+	}
+}
+
+//table results
+output.innerHTML = tableJSON(results);
+
+//table results
+/*
+var tableHTML = t.t0;
+for (i=0; i<results.length; i++){
+	tableHTML += t.s + results[i].bdate 
+		+ t.i + results[i].buybu 
+		+ t.i + results[i].sdate 
+		+ t.i + results[i].sellbu 
+		+ t.i + results[i].selln
+		+ t.e;
+}
+tableHTML += t.tn;
+output.innerHTML = tableHTML;
+*/
+
+//process results for summary
+var summary = [];
+summary["win"] = 0, summary["lose"] = 0, summary["p"]=0, summary["sum"]=0;
+for (i=0; i<results.length; i++){
+	//results[i].selln < 30 ? summary['win']++ : summary['lose']++ ; 
+	summary["sum"] += (results[i].sellbu / results[i].buybu -1)  * 10;
+	
+	if (results[i].selln < 30 && results[i].sellbu > results[i].buybu ){ 
+		summary['win']++ 
+	} else { 
+		summary['lose']++ 
+	}; 
+}
+summary["p"] = summary["win"] / (summary["win"] + summary["lose"] );  
+
+sumOutput.innerHTML = pc2dp(stoploss-1) + "/" + pc2dp(target-1) + " accrued within " + results.length + " days: " + r2dp(summary["sum"]) + "<br /> Success rate of " + pc2dp(summary["p"]) + " vs 50%+/-95% CI of " + ci(0.5, 0.95, results.length);
+
+
+//process data for google
+var googRes = [];
+googRes.push(["Index", "Rate", "Sum"]);
+for (i=0; i<results.length; i++){
+	var arrToAdd = [];
+	var rateToAdd = (results[i].sellbu / results[i].buybu) -1;
+	var cumulative = (i == 0) ? 0 : googRes[i][2];
+	cumulative += rateToAdd;
+	arrToAdd.push(i, rateToAdd, cumulative );
+	googRes.push(arrToAdd);
+}
+
+//display in a google chart
+//https://developers.google.com/chart/interactive/docs/gallery/linechart
+google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(drawChart);
+function drawChart() {
+	var data = google.visualization.arrayToDataTable(googRes);
+
+	var options = {
+		title: 'Strategy Performance',
+		//curveType: 'function',	//to smooth the line
+		legend: { position: 'bottom' },
+		//for dual y-axis
+		vAxes:[
+      {title: 'Bet Return', 				maxValue: 0.2, minValue:-0.2}, // Left axis
+      {title: 'Cumulative Return', 	maxValue: 0.1*summary["sum"], minValue:-0.1*summary["sum"] } // Right axis
+    ],
+		series:[
+			{targetAxisIndex:0},
+			{targetAxisIndex:1}],		
+	};
+
+	var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+	chart.draw(data, options);
+}
+
+//***Functions***
+//date processing
+function returnDate(data){
+	var dateArray = data.split("/");
+	var d = new Date( dateArray[2], dateArray[1]-1, dateArray[0]);
+	return d;
+}
+
+function nDays(ds0, ds1){
+	var d0 = returnDate(ds0);
+	var d1 = returnDate(ds1);
+	
+	return Math.round( (d1 - d0)/(1000*60*60*24) );
+}
+
+function isApreB(dsA, dsB){
+	return nDays(dsA, dsB) > 0 ? true : false;
+}
+
+function isApostB(dsA, dsB){
+	return dsA == dsB ? false : !isApreB(dsA, dsB);
+}
+
+//round to 2dp
+function r2dp(number){
+	return Math.round(number*100)/100;
+}
+
+//pc return
+function pc2dp(number){
+	return r2dp(100 * number) + "%";
+}
+
+//confidence interval
+function ci(p, range, n){
+	var inv = [
+		{"c":0.68, "z":0.994457883209752}, 
+		{"c":0.9, "z":1.64485362695147}, 
+		{"c":0.91, "z":1.69539771027214}, 
+		{"c":0.92, "z":1.75068607125217}, 
+		{"c":0.93, "z":1.8119106729526}, 
+		{"c":0.94, "z":1.88079360815125}, 
+		{"c":0.95, "z":1.95996398454006}, 
+		{"c":0.96, "z":2.05374891063182}, 
+		{"c":0.97, "z":2.17009037758456}, 
+		{"c":0.98, "z":2.32634787404084}, 
+		{"c":0.99, "z":2.57582930354891}
+	];
+	
+	var sa = Math.sqrt( p * (1-p) * (1/n));
+	var z = inv.filter(function(a){return a.c == range})
+	
+	//error trap: ci not populated
+	if (z.length != 1){
+		return range + " not populated in the inverse normal data table";
+	}
+	
+	return ["[", pc2dp(p - z[0].z * sa), " - ", pc2dp(p + z[0].z * sa), "]"].join(""); 
+}
+
+//turn a JSON data object into an HTML string
+function tableJSON(data){
+	var h = [], i, j, tHTML = "", hn=0;
+	var n = data.length;
+	var tb = {
+		s: "<tr><td>",
+		i: "</td><td>",
+		e: "</td></tr>"
+	};
+	
+	//begin table html
+	tHTML += "<table><tr>";
+	
+	//extract headers
+	for (i in data[0]){
+		h.push(i);
+		hn++;
+		tHTML += "<th>" + i + "</th>";
+	}
+	tHTML += "</tr>";
+	
+	//load data into table html
+	for (i=0; i<data.length; i++){
+		for (j=0; j<h.length; j++){
+			j==0 ? tHTML += tb.s : tHTML += tb.i; 
+			tHTML += data[i][ h[j] ];
+			j+1 == h.length ? tHTML += tb.e : tHTML += "";
+		}
+	}
+	
+	//finish table html
+	tHTML += "</table>";
+	return tHTML;
+}
+
+</script>
+</body></html>
