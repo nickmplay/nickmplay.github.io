@@ -42,3 +42,7 @@ This app runs some tests using the Jasime testing framework against some utility
 ## 8-svg_animation.html
 [Demo](http://nickwip-com.stackstaging.com/0_toys/svg_animation.html)
 A simple CSS rotation using the cubic-bezier transform function
+
+## 8-svg_animation.html test
+[Demo](8-svg_animation.html)
+Testing local hosting
